@@ -1,0 +1,4 @@
+Usage: 
+    firebase-project-manager logout
+
+Description: Revokes your current Google oauth access token and removes any saved credentials from your computer.
