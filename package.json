@@ -27,12 +27,14 @@
 		"command-line-tool"
 	],
 	"scripts": {
-		"build": "rm -rf ./dist && tsc && chmod +x ./dist/src/cli.js",
-		"postbuild": "cp ./src/help/*.txt ./dist/src/help",
+		"prebuild": "rm -rf ./dist",
+		"build": "tsc",
+		"postbuild": "cp ./src/help/*.txt ./dist/src/help && chmod +x ./dist/src/cli.js",
+		"firebase-project-manager": "./node_modules/.bin/ts-node ./src/cli.ts",
 		"test": "nyc mocha",
 		"watch": "mocha --watch",
 		"coverage": "nyc report --reporter=text-lcov | coveralls",
-		"prepublish": "yarn build"
+		"prepublishOnly": "yarn build"
 	},
 	"files": [
 		"dist/**"
@@ -72,7 +74,7 @@
 		"mocha": "^6.0.2",
 		"nyc": "^14.1.1",
 		"source-map-support": "^0.5.13",
-		"ts-node": "^8.0.2",
+		"ts-node": "^8.3.0",
 		"tslint": "^5.19.0",
 		"typescript": "^3.6.2"
 	},
