@@ -2,7 +2,9 @@ import { firebaseAPI, gcpAPI } from './apis';
 import { getRandomHexLen, waitOnOperation } from './util';
 
 export enum ERRORS {
-	PROJECTID_TAKEN = 'Requested entity already exists'
+	PROJECTID_TAKEN = 'Requested entity already exists',
+	GCP_TERMS_OF_SERVICE = 'Callers must accept Terms of Service',
+	FIREBASE_TERMS_OF_SERVICE = 'The caller does not have permission'
 }
 
 export enum EVENTS {
