@@ -1,6 +1,0 @@
-Usage: 
-    firebase-project-manager project [OPERATION]
-
-Available operations: 
-    » create <project-name>
-    » add webapp <project-name> <webapp-name>

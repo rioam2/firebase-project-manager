@@ -1,4 +1,0 @@
-Usage: 
-    firebase-project-manager login
-
-Description: Grants this command-line tool access to your Google account, allowing for management of your firebase projects.
