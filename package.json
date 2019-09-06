@@ -29,7 +29,7 @@
 	"scripts": {
 		"prebuild": "rm -rf ./dist",
 		"build": "tsc",
-		"postbuild": "cp ./src/help/*.txt ./dist/src/help && chmod +x ./dist/src/cli.js",
+		"postbuild": "chmod +x ./dist/src/cli.js",
 		"firebase-project-manager": "./node_modules/.bin/ts-node ./src/cli.ts",
 		"test": "nyc mocha",
 		"watch": "mocha --watch",
@@ -64,6 +64,7 @@
 		"@types/chai": "^4.2.0",
 		"@types/cli-spinner": "^0.2.0",
 		"@types/configstore": "^4.0.0",
+		"@types/figlet": "^1.2.0",
 		"@types/inquirer": "^6.5.0",
 		"@types/mocha": "^5.2.6",
 		"@types/node": "^12.7.3",
@@ -80,8 +81,11 @@
 		"typescript": "^3.6.2"
 	},
 	"dependencies": {
+		"chalk": "^2.4.2",
 		"cli-spinner": "^0.2.10",
+		"commander": "^3.0.1",
 		"configstore": "^5.0.0",
+		"figlet": "^1.2.4",
 		"googleapis": "^42.0.0",
 		"inquirer": "^7.0.0",
 		"open": "^6.4.0",
