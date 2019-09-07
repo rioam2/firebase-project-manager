@@ -10,20 +10,12 @@ const CALLBACK_SERVER = {
 	URL: `http://localhost:9005`
 };
 const OAUTH = {
-	CLIENT_ID:
-		'514670030483-l26u9lmdeidnfdfid3cfmjiu3p84r9ea.apps.googleusercontent.com',
+	CLIENT_ID: '514670030483-l26u9lmdeidnfdfid3cfmjiu3p84r9ea.apps.googleusercontent.com',
 	CLIENT_SECRET: 'esSSrnwU2_CVBkSUd9zaZC80',
-	SCOPE: [
-		'https://www.googleapis.com/auth/cloud-platform',
-		'https://www.googleapis.com/auth/firebase'
-	]
+	SCOPE: ['https://www.googleapis.com/auth/cloud-platform', 'https://www.googleapis.com/auth/firebase']
 };
 
-export const oauth2Client = new google.auth.OAuth2(
-	OAUTH.CLIENT_ID,
-	OAUTH.CLIENT_SECRET,
-	CALLBACK_SERVER.URL
-);
+export const oauth2Client = new google.auth.OAuth2(OAUTH.CLIENT_ID, OAUTH.CLIENT_SECRET, CALLBACK_SERVER.URL);
 
 const conf = new Configstore(CONFIGSTORE_NAME);
 (function credentialManager() {

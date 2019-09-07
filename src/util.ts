@@ -4,12 +4,17 @@ import { textSync as figlet } from 'figlet';
 import { cloudresourcemanager_v1, firebase_v1beta1 } from 'googleapis';
 import * as inquirer from 'inquirer';
 
+import { CloudResourceManagerApi, FirebaseApi } from './apis.types';
+
+export type ShiftArgs<T> = T extends (arg0: any, ...args: infer R) => any ? R : never;
+
+type FirebaseOperation = firebase_v1beta1.Schema$Operation;
+type CloudResourceManagerOperation = cloudresourcemanager_v1.Schema$Operation;
+
 export async function waitOnOperation(
-	api: cloudresourcemanager_v1.Cloudresourcemanager | firebase_v1beta1.Firebase,
+	api: CloudResourceManagerApi | FirebaseApi,
 	name: string
-): Promise<
-	cloudresourcemanager_v1.Schema$Operation | firebase_v1beta1.Schema$Operation
-> {
+): Promise<CloudResourceManagerOperation | FirebaseOperation> {
 	return new Promise((res, rej) => {
 		const checkupInterval = setInterval(async () => {
 			const result = await api.operations.get({ name });
@@ -118,9 +123,7 @@ export class CLI {
 	public description(description: string) {
 		const parent = this.inquirerConfig[this.getParentCmdPath()];
 		if (typeof parent !== 'function') {
-			const choice = (parent.choices as any[]).find(
-				elt => elt.value === this.currentCmdPathStr
-			);
+			const choice = (parent.choices as any[]).find(elt => elt.value === this.currentCmdPathStr);
 			choice.name = description;
 		}
 		this.currentCommand.description(description);
@@ -144,9 +147,7 @@ export class CLI {
 						message: arg.message,
 						name: arg.name,
 						validate(answer) {
-							return !arg.required || (arg.required && answer)
-								? true
-								: 'This is required';
+							return !arg.required || (arg.required && answer) ? true : 'This is required';
 						}
 					};
 					argValues[arg.name] = (await inquirer.prompt(config))[arg.name];

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { Spinner } from 'cli-spinner';
 
+import { createFirebaseProject, EVENTS } from '.';
 import { authenticate, deauthenticate } from './auth';
-import { createFirebaseProject, EVENTS } from './firebase';
 import { CLI } from './util';
 
 const program = new CLI();
