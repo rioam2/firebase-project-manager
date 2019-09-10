@@ -1,23 +1,23 @@
 import { GoogleApis } from './apis.types';
 import { ERRORS, EventCB, EVENTS } from './firebase.types';
-import { getRandomHexLen, waitOnOperation } from './util';
+import { getRandomHexLen, noop, waitOnOperation } from './util';
 
-export async function createFirebaseProject(googleapis: GoogleApis, name: string, cb: EventCB = () => {}) {
+export async function createFirebaseProject(googleapis: GoogleApis, name: string, cb: EventCB = noop) {
 	const projectId = await createGCProject(googleapis, name, cb);
 	await addFirebaseFeatures(googleapis, projectId, cb);
 	return projectId;
 }
 
-export async function addFirebaseFeatures(googleapis: GoogleApis, projectId: string, cb: EventCB = () => {}) {
+export async function addFirebaseFeatures(googleapis: GoogleApis, projectId: string, cb: EventCB = noop) {
 	const project = `projects/${projectId}`;
-	cb(EVENTS.ADD_FIREBASE_FEATURES_STARTED, projectId);
+	cb(EVENTS.ADD_FIREBASE_FEATURES_STARTED);
 	const response = await googleapis.firebase.projects.addFirebase({ project });
 	const operationName = response.data.name as string;
 	await waitOnOperation(googleapis.firebase, operationName);
 	cb(EVENTS.ADD_FIREBASE_FEATURES_SUCCEEDED);
 }
 
-export async function createGCProject(googleapis: GoogleApis, name: string, cb: EventCB = () => {}): Promise<string> {
+export async function createGCProject(googleapis: GoogleApis, name: string, cb: EventCB = noop): Promise<string> {
 	return (async function attemptCreate(randSuffix = '') {
 		const projectId = randSuffix ? `${name}-${randSuffix}` : name;
 		cb(EVENTS.PROJECT_CREATION_ATTEMPT_STARTED, projectId);
@@ -31,6 +31,7 @@ export async function createGCProject(googleapis: GoogleApis, name: string, cb: 
 			return (data.response as any).projectId as string;
 		} catch (e) {
 			if (e.message === ERRORS.PROJECTID_TAKEN) {
+				cb(EVENTS.PROJECT_CREATION_NAME_TAKEN, projectId);
 				return attemptCreate(randSuffix + getRandomHexLen(4));
 			} else {
 				throw e;

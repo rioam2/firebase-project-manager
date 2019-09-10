@@ -6,7 +6,17 @@ import * as inquirer from 'inquirer';
 
 import { CloudResourceManagerApi, FirebaseApi } from './apis.types';
 
+export const noop = () => undefined;
+
 export type ShiftArgs<T> = T extends (arg0: any, ...args: infer R) => any ? R : never;
+
+export type DeepPartial<T> = {
+	[P in keyof T]?: T[P] extends Array<infer U>
+		? Array<DeepPartial<U>>
+		: T[P] extends ReadonlyArray<infer R>
+		? ReadonlyArray<DeepPartial<R>>
+		: DeepPartial<T[P]>;
+};
 
 type FirebaseOperation = firebase_v1beta1.Schema$Operation;
 type CloudResourceManagerOperation = cloudresourcemanager_v1.Schema$Operation;
