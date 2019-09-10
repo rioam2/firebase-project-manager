@@ -1,53 +1,37 @@
-import { firebaseAPI, gcpAPI } from './apis';
-import { getRandomHexLen, waitOnOperation } from './util';
+import { GoogleApis } from './apis.types';
+import { ERRORS, EventCB, EVENTS } from './firebase.types';
+import { getRandomHexLen, noop, waitOnOperation } from './util';
 
-export enum ERRORS {
-	PROJECTID_TAKEN = 'Requested entity already exists',
-	GCP_TERMS_OF_SERVICE = 'Callers must accept Terms of Service',
-	FIREBASE_TERMS_OF_SERVICE = 'The caller does not have permission'
-}
-
-export enum EVENTS {
-	PROJECT_CREATION_ATTEMPT_STARTED,
-	PROJECT_CREATION_STARTED,
-	PROJECT_CREATION_SUCCEEDED,
-	ADD_FIREBASE_FEATURES_STARTED,
-	ADD_FIREBASE_FEATURES_SUCCEEDED
-}
-type EventCB = (event: EVENTS, data?: any) => void;
-
-export async function createFirebaseProject(name: string, cb?: EventCB) {
-	const projectId = await createGCProject(name, cb);
-	await addFirebaseFeatures(projectId, cb);
+export async function createFirebaseProject(googleapis: GoogleApis, name: string, cb: EventCB = noop) {
+	const projectId = await createGCProject(googleapis, name, cb);
+	await addFirebaseFeatures(googleapis, projectId, cb);
 	return projectId;
 }
 
-export async function addFirebaseFeatures(projectId: string, cb?: EventCB) {
+export async function addFirebaseFeatures(googleapis: GoogleApis, projectId: string, cb: EventCB = noop) {
 	const project = `projects/${projectId}`;
-	cb && cb(EVENTS.ADD_FIREBASE_FEATURES_STARTED, projectId);
-	const response = await firebaseAPI.projects.addFirebase({ project });
+	cb(EVENTS.ADD_FIREBASE_FEATURES_STARTED);
+	const response = await googleapis.firebase.projects.addFirebase({ project });
 	const operationName = response.data.name as string;
-	await waitOnOperation(firebaseAPI, operationName);
-	cb && cb(EVENTS.ADD_FIREBASE_FEATURES_SUCCEEDED);
+	await waitOnOperation(googleapis.firebase, operationName);
+	cb(EVENTS.ADD_FIREBASE_FEATURES_SUCCEEDED);
 }
 
-export async function createGCProject(
-	name: string,
-	cb?: EventCB
-): Promise<string> {
+export async function createGCProject(googleapis: GoogleApis, name: string, cb: EventCB = noop): Promise<string> {
 	return (async function attemptCreate(randSuffix = '') {
 		const projectId = randSuffix ? `${name}-${randSuffix}` : name;
-		cb && cb(EVENTS.PROJECT_CREATION_ATTEMPT_STARTED, projectId);
+		cb(EVENTS.PROJECT_CREATION_ATTEMPT_STARTED, projectId);
 		try {
 			const request = { requestBody: { projectId, name } };
-			const response = await gcpAPI.projects.create(request);
+			const response = await googleapis.cloudresourcemanager.projects.create(request);
 			const operationName = response.data.name as string;
-			cb && cb(EVENTS.PROJECT_CREATION_STARTED, projectId);
-			const data = await waitOnOperation(gcpAPI, operationName);
-			cb && cb(EVENTS.PROJECT_CREATION_SUCCEEDED, projectId);
+			cb(EVENTS.PROJECT_CREATION_STARTED, projectId);
+			const data = await waitOnOperation(googleapis.cloudresourcemanager, operationName);
+			cb(EVENTS.PROJECT_CREATION_SUCCEEDED, projectId);
 			return (data.response as any).projectId as string;
 		} catch (e) {
 			if (e.message === ERRORS.PROJECTID_TAKEN) {
+				cb(EVENTS.PROJECT_CREATION_NAME_TAKEN, projectId);
 				return attemptCreate(randSuffix + getRandomHexLen(4));
 			} else {
 				throw e;
