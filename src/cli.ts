@@ -45,7 +45,7 @@ program
 	.command('login')
 	.description('Login and save credentials')
 	.action(async () => {
-		await authenticate();
+		await authenticate(true);
 		program.run();
 	});
 
@@ -53,7 +53,7 @@ program
 	.command('logout')
 	.description('Logout and clear saved credentials')
 	.action(async () => {
-		await deauthenticate();
+		await deauthenticate(true);
 		program.run();
 	});
 

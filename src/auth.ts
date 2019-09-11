@@ -62,7 +62,7 @@ async function getGoogleAuthCode(): Promise<string> {
 }
 
 export async function authenticate(verbose = false) {
-	if (oauth2Client.credentials.access_token) {
+	if (oauth2Client.credentials.refresh_token) {
 		verbose && console.info('You are already logged in. \n');
 	} else {
 		const authorizationCode = await getGoogleAuthCode();
