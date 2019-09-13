@@ -4,24 +4,16 @@ import { GoogleApis } from './apis.types';
 import { ERRORS, EventCB, EVENTS } from './firebase.types';
 import { getRandomHexLen, noop, waitOnOperation } from './util';
 
-export async function getFirebaseWebappConfig(googleapis: GoogleApis, name: string);
-export async function getFirebaseWebappConfig(googleapis: GoogleApis, projectId: string, appId?: string);
 export async function getFirebaseWebappConfig(googleapis: GoogleApis, projectId: string, appId?: string) {
-	let name = projectId;
-	if (projectId.includes('/') || appId) {
-		name = `projects/${projectId}/webApps/${appId}`;
-	}
+	const isFullPath = projectId.includes('/');
+	const name = isFullPath ? projectId : `projects/${projectId}/webApps/${appId}`;
 	const { data } = await googleapis.firebase.projects.webApps.getConfig({ name });
 	return data;
 }
 
-export async function getFirebaseWebapp(googleapis: GoogleApis, name: string);
-export async function getFirebaseWebapp(googleapis: GoogleApis, projectId: string, appId?: string);
 export async function getFirebaseWebapp(googleapis: GoogleApis, projectId: string, appId?: string) {
-	let name = projectId;
-	if (projectId.includes('/') || appId) {
-		name = `projects/${projectId}/webApps/${appId}`;
-	}
+	const isFullPath = projectId.includes('/');
+	const name = isFullPath ? projectId : `projects/${projectId}/webApps/${appId}`;
 	const { data } = await googleapis.firebase.projects.webApps.get({ name });
 	return data;
 }
@@ -81,8 +73,12 @@ export async function addFirebaseFeatures(googleapis: GoogleApis, projectId: str
 }
 
 export async function createGCProject(googleapis: GoogleApis, name: string, cb: EventCB = noop): Promise<string> {
+	const projectIdBase = name
+		.replace(/\s/g, '-') /* replace whitespace with dashes */
+		.replace(/[^A-z0-9\-]|\[|\]|\^|\_|\`|\\/g, '') /* Remove all non-alphanumeric characters */
+		.toLowerCase();
 	return (async function attemptCreate(randSuffix = '') {
-		const projectId = randSuffix ? `${name}-${randSuffix}` : name;
+		const projectId = randSuffix ? `${projectIdBase}-${randSuffix}` : projectIdBase;
 		cb(EVENTS.PROJECT_CREATION_ATTEMPT_STARTED, projectId);
 		try {
 			const request = { requestBody: { projectId, name } };
