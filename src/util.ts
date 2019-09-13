@@ -1,6 +1,7 @@
 import chalk from 'chalk';
 import { Command } from 'commander';
 import { textSync as figlet } from 'figlet';
+import { GaxiosResponse } from 'gaxios';
 import { cloudresourcemanager_v1, firebase_v1beta1 } from 'googleapis';
 import * as inquirer from 'inquirer';
 
@@ -23,8 +24,9 @@ type CloudResourceManagerOperation = cloudresourcemanager_v1.Schema$Operation;
 
 export async function waitOnOperation(
 	api: CloudResourceManagerApi | FirebaseApi,
-	name: string
+	operation: GaxiosResponse<cloudresourcemanager_v1.Schema$Operation>
 ): Promise<CloudResourceManagerOperation | FirebaseOperation> {
+	const name = operation.data.name;
 	return new Promise((res, rej) => {
 		const checkupInterval = setInterval(async () => {
 			const result = await api.operations.get({ name });
@@ -152,13 +154,18 @@ export class CLI {
 			this.inquirerConfig[this.currentCmdPathStr] = async () => {
 				const argValues = {};
 				for (const arg of cmdArgsCopy) {
+					const choices = arg.initialValue && arg.initialValue.includes(',') ? arg.initialValue.split(',') : undefined;
+					const type = choices ? 'list' : 'input';
+					const initialValue = choices ? choices[0] : arg.initialValue;
 					const config: inquirer.QuestionCollection = {
-						default: arg.initialValue,
+						choices,
+						default: initialValue,
 						message: arg.message,
 						name: arg.name,
 						validate(answer) {
 							return !arg.required || (arg.required && answer) ? true : 'This is required';
-						}
+						},
+						type
 					};
 					argValues[arg.name] = (await inquirer.prompt(config))[arg.name];
 				}
