@@ -1,7 +1,7 @@
 {
 	"name": "firebase-project-manager",
 	"license": "MIT",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"author": "rioam2",
 	"homepage": "https://www.npmjs.com/package/firebase-project-manager",
 	"description": "Create and manage your Firebase projects from the command line or with code",
