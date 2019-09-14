@@ -6,7 +6,7 @@ import { getRandomHexLen, noop, waitOnOperation } from './util';
 
 export async function getFirebaseWebappConfig(googleapis: GoogleApis, projectId: string, appId?: string) {
 	const isFullPath = projectId.includes('/');
-	const name = isFullPath ? projectId : `projects/${projectId}/webApps/${appId}`;
+	const name = isFullPath ? projectId : `projects/${projectId}/webApps/${appId}/config`;
 	const { data } = await googleapis.firebase.projects.webApps.getConfig({ name });
 	return data;
 }
