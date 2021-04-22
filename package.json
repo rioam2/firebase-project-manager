@@ -83,7 +83,7 @@
 		"typescript": "^3.6.2"
 	},
 	"dependencies": {
-		"chalk": "^2.4.2",
+		"chalk": "^4.1.1",
 		"cli-spinner": "^0.2.10",
 		"commander": "^5.0.0",
 		"configstore": "^5.0.0",
